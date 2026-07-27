@@ -1,0 +1,119 @@
+body {
+  margin: 0;
+  font-family: 'Segoe UI', sans-serif;
+  color: white;
+  background:
+    linear-gradient(rgba(10, 35, 80, 0.55),
+      rgba(18, 52, 120, 0.55)),
+    url('asset/ubea.jpg');
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+  background-attachment: fixed;
+}
+
+.main-container {
+  min-height: 100vh;
+  background:
+    linear-gradient(rgba(20, 70, 170, 0.35),
+      rgba(5, 25, 70, 0.60));
+}
+
+.logo {
+  width: 120px;
+  height: 120px;
+  border-radius: 50%;
+}
+
+.divider {
+  width: 3px;
+  height: 80px;
+  background-color: white;
+}
+
+.title {
+  font-size: 3rem;
+  font-weight: bold;
+  letter-spacing: 5px;
+}
+
+.subtitle {
+  font-size: 1.5rem;
+  font-weight: 600;
+  color: #aab4ff;
+  letter-spacing: 2px;
+}
+
+.button-group {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.custom-btn {
+  padding: 12px 30px;
+  font-size: 1.1rem;
+  font-weight: 600;
+  border-radius: 10px;
+  background: linear-gradient(90deg, #000, #4b4bff);
+  color: white;
+  border: none;
+  transition: all 0.3s ease;
+}
+
+.custom-btn:hover {
+  transform: scale(1.05);
+  background: linear-gradient(90deg, #4b4bff, #000);
+}
+
+/* Row layout: button + icon */
+.btn-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+/* Make main button stretch nicely */
+.btn-row .custom-btn {
+  flex: 1;
+}
+
+/* 🔹 Small icon button */
+.icon-btn {
+  width: 50px;
+  height: 50px;
+  border-radius: 12px;
+  background: linear-gradient(90deg, #000, #4b4bff);
+  color: white;
+  border: none;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 18px;
+  transition: all 0.3s ease;
+}
+
+.icon-btn:hover {
+  transform: scale(1.1);
+  background: linear-gradient(90deg, #4b4bff, #000);
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .title {
+    font-size: 2rem;
+  }
+
+  .subtitle {
+    font-size: 1rem;
+  }
+
+  .logo {
+    width: 80px;
+    height: 80px;
+  }
+
+  .divider {
+    display: none;
+  }
+}
