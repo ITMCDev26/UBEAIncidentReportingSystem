@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Dashboard — Unified Command Center</title>
+<link rel="stylesheet" href="css/style.css" />
+</head>
+<body>
+  <div class="app-shell">
+    <aside class="sidebar" data-shell="sidebar"></aside>
+
+    <div class="main">
+      <div class="topbar">
+        <h1>Command Center Dashboard</h1>
+        <div class="topbar-right">
+          <button class="icon-btn" data-shell="theme-btn" id="themeToggle">☀️</button>
+          <a class="btn btn-primary" href="new-report.html?type=initial&mode=new" style="padding:9px 16px;">+ New Initial Report</a>
+        </div>
+      </div>
+
+      <div class="page">
+        <div class="banner hidden" id="openCaseBanner"></div>
+
+        <section id="overviewPage">
+          <div class="grid grid-4" style="margin-bottom:20px;">
+            <div class="card stat-card"><div class="stat-label">Total Reports</div><div class="stat-value" id="statTotal">0</div></div>
+            <div class="card stat-card stat-red"><div class="stat-label">Open Cases</div><div class="stat-value" id="statOpen">0</div></div>
+            <div class="card stat-card stat-yellow"><div class="stat-label">Active Red Alerts</div><div class="stat-value" id="statRed">0</div></div>
+            <div class="card stat-card stat-green"><div class="stat-label">Filed Today</div><div class="stat-value" id="statToday">0</div></div>
+          </div>
+          <h3 class="form-section-title">By Township / Area</h3>
+          <div class="grid grid-2" id="townshipBreakdown"></div>
+        </section>
+
+        <section id="historyPage" class="hidden">
+          <div class="toolbar">
+            <select id="filterType" onchange="Dashboard.renderHistory()">
+              <option value="">All Types</option>
+              <option value="initial">Initial</option>
+              <option value="progress">Progress</option>
+              <option value="information">Information</option>
+            </select>
+            <select id="filterStatus" onchange="Dashboard.renderHistory()">
+              <option value="">All Status</option>
+              <option value="open">Ongoing</option>
+              <option value="resolved">Resolved</option>
+            </select>
+            <input type="text" id="filterSearch" placeholder="Search code, incident, reporter…" oninput="Dashboard.renderHistory()" />
+            <div class="spacer"></div>
+            <a class="btn btn-ghost" href="new-report.html?type=information&mode=new">+ Information Report</a>
+          </div>
+          <div class="card" style="padding:0;overflow:hidden;">
+            <table class="report-table">
+              <thead><tr>
+                <th>Code</th><th>Incident</th><th>Alert</th><th>Township</th><th>Date</th><th>Status</th><th>Actions</th>
+              </tr></thead>
+              <tbody id="historyBody"></tbody>
+            </table>
+          </div>
+        </section>
+      </div>
+    </div>
+  </div>
+
+  <nav class="bottom-tabs" data-shell="bottomtabs"></nav>
+
+  <script src="js/config.js"></script>
+  <script src="js/formSchemas.js"></script>
+  <script src="js/api.js"></script>
+  <script src="js/auth.js"></script>
+  <script src="js/ui.js"></script>
+  <script src="js/theme.js"></script>
+  <script src="js/pdf.js"></script>
+  <script src="js/dashboard.js"></script>
+</body>
+</html>

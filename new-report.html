@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>New Report — Unified Command Center</title>
+<link rel="stylesheet" href="css/style.css" />
+</head>
+<body>
+  <div class="app-shell">
+    <aside class="sidebar" data-shell="sidebar"></aside>
+
+    <div class="main">
+      <div class="topbar">
+        <h1 id="formTitle">New Report</h1>
+        <div class="topbar-right">
+          <button class="icon-btn" data-shell="theme-btn" id="themeToggle">☀️</button>
+          <a class="btn btn-ghost" href="dashboard.html#history" style="padding:9px 16px;">← Back to History</a>
+        </div>
+      </div>
+
+      <div class="page">
+        <div class="banner hidden" id="lockedBanner">
+          🔒 This incident is marked <b>Resolved</b>. Records are locked and can no longer be edited.
+        </div>
+
+        <div class="card form-card">
+          <div id="formRoot" class="form-grid"></div>
+          <div class="form-footer">
+            <a class="btn btn-ghost" href="dashboard.html#history">Cancel</a>
+            <button class="btn btn-primary" id="submitBtn">Submit Report</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <nav class="bottom-tabs" data-shell="bottomtabs"></nav>
+
+  <script src="js/config.js"></script>
+  <script src="js/formSchemas.js"></script>
+  <script src="js/api.js"></script>
+  <script src="js/auth.js"></script>
+  <script src="js/ui.js"></script>
+  <script src="js/theme.js"></script>
+  <script>document.addEventListener("DOMContentLoaded", () => AppShell.mount("new"));</script>
+  <script src="js/forms.js"></script>
+</body>
+</html>

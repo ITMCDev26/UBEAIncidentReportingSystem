@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Super Admin — Unified Command Center</title>
+<link rel="stylesheet" href="css/style.css" />
+</head>
+<body>
+  <div class="app-shell">
+    <aside class="sidebar" data-shell="sidebar"></aside>
+
+    <div class="main">
+      <div class="topbar">
+        <h1>Super Admin</h1>
+        <div class="topbar-right">
+          <button class="icon-btn" data-shell="theme-btn" id="themeToggle">☀️</button>
+        </div>
+      </div>
+
+      <div class="page">
+        <h3 class="form-section-title">🧑‍✈️ OPCEN Accounts</h3>
+        <div class="grid grid-2" style="align-items:start;">
+          <div class="card" style="padding:0;overflow:hidden;">
+            <table class="report-table">
+              <thead><tr><th>Username</th><th>Name</th><th>Township</th><th>Role</th><th></th></tr></thead>
+              <tbody id="usersBody"></tbody>
+            </table>
+          </div>
+          <div class="card">
+            <form id="addUserForm">
+              <div class="field"><label>Username</label><input id="u_username" required /></div>
+              <div class="field"><label>Full Name</label><input id="u_fullName" required /></div>
+              <div class="field"><label>Password <span class="text-faint">(leave blank to keep unchanged when editing)</span></label><input id="u_password" type="text" /></div>
+              <div class="field"><label>Township</label><select id="u_township"></select></div>
+              <div class="field"><label>Role</label>
+                <select id="u_role">
+                  <option value="operator">Operator (Comcen)</option>
+                  <option value="admin">Super Admin</option>
+                </select>
+              </div>
+              <button class="btn btn-primary" type="submit" style="width:100%;">Save Account</button>
+            </form>
+          </div>
+        </div>
+
+        <h3 class="form-section-title" style="margin-top:34px;">📋 Form Content</h3>
+        <p class="text-muted" style="margin-top:-6px;">Edit these lists to update the dropdown choices every operator sees — one item per line. Changes apply instantly, no code changes needed.</p>
+        <form id="configForm" class="grid grid-3">
+          <div class="card">
+            <label style="font-weight:600;font-size:13px;">Type of Incident</label>
+            <textarea id="cfg_incidentTypes" style="width:100%;min-height:220px;margin-top:8px;background:var(--bg-input);border:1px solid var(--border);color:var(--text-primary);border-radius:8px;padding:10px;"></textarea>
+          </div>
+          <div class="card">
+            <label style="font-weight:600;font-size:13px;">Vehicular Accident — Classification</label>
+            <textarea id="cfg_incidentClassification" style="width:100%;min-height:220px;margin-top:8px;background:var(--bg-input);border:1px solid var(--border);color:var(--text-primary);border-radius:8px;padding:10px;"></textarea>
+          </div>
+          <div class="card">
+            <label style="font-weight:600;font-size:13px;">Weather Options</label>
+            <textarea id="cfg_weather" style="width:100%;min-height:220px;margin-top:8px;background:var(--bg-input);border:1px solid var(--border);color:var(--text-primary);border-radius:8px;padding:10px;"></textarea>
+            <button class="btn btn-primary" type="submit" style="width:100%;margin-top:12px;">Save Form Content</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <nav class="bottom-tabs" data-shell="bottomtabs"></nav>
+
+  <script src="js/config.js"></script>
+  <script src="js/api.js"></script>
+  <script src="js/auth.js"></script>
+  <script src="js/ui.js"></script>
+  <script src="js/theme.js"></script>
+  <script src="js/admin.js"></script>
+</body>
+</html>
