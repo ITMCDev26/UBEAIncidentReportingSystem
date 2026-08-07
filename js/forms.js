@@ -35,12 +35,17 @@ const FormPage = {
     this.mode = this.qs.get("mode") || "new";
     this.refId = this.qs.get("ref");
 
+    this.renderTypeTabs();
     document.getElementById("formTitle").textContent = this.titleFor(this.type, this.mode);
 
     try {
-      this.config = (await API.getConfig()) || APP_CONFIG;
+      const apiConfig = await API.getConfig();
+      // Merge with the static fallback so that if the Sheet's Config tab is
+      // ever missing/empty for a category (e.g. Weather), the form still
+      // renders working options instead of a blank, unclickable group.
+      this.config = this.mergeConfig(APP_CONFIG, apiConfig);
     } catch (e) {
-      this.config = APP_CONFIG; // fallback so the form still renders offline
+      this.config = APP_CONFIG; // fully offline fallback so the form still renders
     }
 
     if (this.refId) {
@@ -72,6 +77,36 @@ const FormPage = {
     return "New " + names[type];
   },
 
+  // Renders the Initial / Information tab switcher on the New Report page.
+  // Only shown for brand-new reports — Progress reports are always reached
+  // via "Start Progress Report" on an Initial record, never picked directly.
+  renderTypeTabs() {
+    const el = document.getElementById("reportTypeTabs");
+    if (!el) return;
+    if (this.mode !== "new" || this.type === "progress") { el.classList.add("hidden"); return; }
+    el.classList.remove("hidden");
+    const tabs = [
+      { type: "initial", label: "🆕 Initial Report" },
+      { type: "information", label: "ℹ️ Information Report" }
+    ];
+    el.innerHTML = tabs.map(t =>
+      `<a class="report-type-tab ${t.type === this.type ? "active" : ""}" href="new-report.html?type=${t.type}&mode=new">${t.label}</a>`
+    ).join("");
+  },
+
+  // Combines the local fallback config with whatever the backend returned,
+  // preferring the backend's list for a category ONLY if it actually has
+  // entries. This is what stops a single empty/misconfigured category
+  // (like Weather) from rendering as an empty, non-clickable group.
+  mergeConfig(fallback, apiConfig) {
+    const merged = { ...fallback, ...(apiConfig || {}) };
+    ["incidentTypes", "incidentClassification", "weather", "alertLevels", "townships", "incidentCategory"].forEach(key => {
+      const apiVal = apiConfig ? apiConfig[key] : null;
+      if (!apiVal || !Array.isArray(apiVal) || apiVal.length === 0) merged[key] = fallback[key];
+    });
+    return merged;
+  },
+
   refTypeFor() {
     // the report we branch FROM: initial->progress uses 'initial', a follow-up uses same type
     return this.type === "progress" && this.mode === "new" ? "initial" : this.type;
@@ -99,13 +134,10 @@ const FormPage = {
   render() {
     const root = document.getElementById("formRoot");
     root.innerHTML = "";
-    if (this.locked) {
-      document.getElementById("lockedBanner").classList.remove("hidden");
-    }
+    root.className = "row g-3"; // Bootstrap grid — replaces the old hand-rolled CSS grid
+    document.getElementById("lockedBanner").classList.toggle("hidden", !this.locked);
 
     const fieldKeys = FORM_SCHEMAS[this.type];
-    let currentSection = null;
-
     fieldKeys.forEach(key => {
       const field = FIELD_LIBRARY[key];
       if (!field) return;
@@ -117,16 +149,23 @@ const FormPage = {
     this.wireConditionals();
   },
 
+  // Bootstrap column classes: full-width widgets (textarea, township
+  // carousel, icon-choice, yes/no) always take the full row; simple
+  // inputs sit two-per-row on tablet/desktop and stack on phones.
   fieldWrap(field, inner) {
-    const wrap = document.createElement("div");
-    wrap.className = "field" + (["textarea", "township-carousel", "icon-choice", "yesno"].includes(field.type) ? " full" : "");
-    wrap.dataset.key = field.key;
-    if (field.showIf) wrap.dataset.showIf = JSON.stringify(field.showIf);
+    const fullWidth = ["textarea", "township-carousel", "icon-choice", "yesno"].includes(field.type);
+    const col = document.createElement("div");
+    col.className = fullWidth ? "col-12" : "col-12 col-md-6";
+    col.dataset.key = field.key;
+    if (field.showIf) col.dataset.showIf = JSON.stringify(field.showIf);
     const label = document.createElement("label");
+    label.className = "form-label fw-semibold small text-uppercase";
+    label.style.color = "var(--text-muted)";
+    label.style.letterSpacing = ".03em";
     label.innerHTML = field.label + (field.required ? ' <span class="required-mark">*</span>' : "");
-    wrap.appendChild(label);
-    wrap.appendChild(inner);
-    return wrap;
+    col.appendChild(label);
+    col.appendChild(inner);
+    return col;
   },
 
   renderField(field) {
@@ -135,6 +174,7 @@ const FormPage = {
 
     if (field.type === "select") {
       const sel = document.createElement("select");
+      sel.className = "form-select";
       sel.id = "f_" + field.key; sel.disabled = this.locked;
       sel.innerHTML = '<option value="">Select…</option>' +
         (this.config[field.optionsFrom] || []).map(opt =>
@@ -145,12 +185,14 @@ const FormPage = {
 
     if (field.type === "text") {
       const inp = document.createElement("input");
+      inp.className = "form-control";
       inp.type = "text"; inp.id = "f_" + field.key; inp.value = val; inp.disabled = this.locked;
       return this.fieldWrap(field, inp);
     }
 
     if (field.type === "date") {
       const inp = document.createElement("input");
+      inp.className = "form-control";
       inp.type = "date"; inp.id = "f_" + field.key;
       inp.value = val || new Date().toISOString().slice(0, 10);
       inp.disabled = this.locked;
@@ -159,13 +201,16 @@ const FormPage = {
 
     if (field.type === "time") {
       const inp = document.createElement("input");
+      inp.className = "form-control";
       inp.type = "time"; inp.id = "f_" + field.key; inp.value = val; inp.disabled = this.locked;
       return this.fieldWrap(field, inp);
     }
 
     if (field.type === "textarea") {
       const ta = document.createElement("textarea");
+      ta.className = "form-control";
       ta.id = "f_" + field.key; ta.value = val; ta.disabled = this.locked;
+      ta.rows = 3;
       return this.fieldWrap(field, ta);
     }
 
@@ -294,25 +339,47 @@ const FormPage = {
     const btn = document.getElementById("submitBtn");
     btn.disabled = true; btn.textContent = "Submitting…";
     try {
-      let result;
+      let result, verb;
       if (this.mode === "edit") {
         result = await API.updateReport(this.type, this.refId, data);
-        Toast.show("Report updated: " + result.id);
+        verb = "updated";
       } else if (this.type === "initial") {
         result = await API.createInitialReport(data);
-        Toast.show("Initial report filed: " + result.id);
+        verb = "filed";
       } else if (this.type === "progress") {
         result = await API.createProgressReport(data);
-        Toast.show("Progress report filed: " + result.id);
+        verb = "filed";
       } else {
         result = await API.createInformationReport(data);
-        Toast.show("Information report filed: " + result.id);
+        verb = "filed";
       }
-      setTimeout(() => { window.location.href = "dashboard.html#history"; }, 900);
+      // The backend returns the full saved record (not just an id) so we
+      // can offer an immediate print / save-as-PDF right after submitting.
+      const fullReport = (result && result.id && result.type) ? result : { ...data, id: result.id, type: this.type };
+      this.showSuccess(fullReport, verb);
     } catch (e) {
       Toast.show(e.message || "Submission failed", true);
       btn.disabled = false; btn.textContent = "Submit Report";
     }
+  },
+
+  showSuccess(report, verb) {
+    Toast.show(`Report ${verb}: ${report.id}`);
+    const html = `
+      <div class="modal-header">
+        <h5 class="modal-title">✅ Report ${verb}</h5>
+        <button type="button" class="btn-close" onclick="Modal.close()"></button>
+      </div>
+      <div class="modal-body text-center py-4">
+        <div class="mb-2 text-muted">Reference code</div>
+        <div class="code-chip" style="font-size:16px;padding:8px 16px;">${report.id}</div>
+        <p class="text-muted mt-3 mb-0">Your report has been saved to the Sheet and posted to the Telegram group.</p>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-outline-secondary" onclick="Modal.close(); window.location.href='dashboard.html#history';">Go to History</button>
+        <button class="btn btn-primary" onclick="ReportPrint.preview(${JSON.stringify(report).replace(/'/g, "&#39;")}, '${report.type}')">🖨️ Print / Save as PDF</button>
+      </div>`;
+    Modal.open(html, { staticBackdrop: true });
   }
 };
 

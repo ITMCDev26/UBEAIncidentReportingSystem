@@ -13,7 +13,11 @@ Browser (GitHub Pages) --fetch()--> Apps Script Web App --> Google Sheet
 
 ## What's included
 - Login screen that checks credentials against a `Users` tab in the Sheet
-- Operator dashboard: live stats, report history, filters, per-township breakdown (admin)
+- Operator dashboard: live stats, report history, filters, per-township breakdown (admin),
+  built on **Bootstrap 5** so it lays out correctly on phones, tablets, and desktop
+- **New Report page** now shows both **Initial Report** and **Information Report** as tabs
+  right at the top — Progress reports are still only reached via "Start Progress Report"
+  on an existing Initial record, since a progress update always has to be linked to one
 - Initial / Progress / Information report forms, built from one shared schema
   (`js/formSchemas.js`) so editing a field list edits all three forms at once
 - Incident-code generation exactly as specified:
@@ -29,16 +33,24 @@ Browser (GitHub Pages) --fetch()--> Apps Script Web App --> Google Sheet
 - Resolved lock: once a Progress/Information report is marked **Resolved =
   Yes**, that entire incident thread (including the Initial record) becomes
   read-only everywhere in the app
-- Report History: print/PDF preview per report (browser print-to-PDF, no
-  extra library)
-- 6:00 PM open-case reminder — both a banner inside the app **and** a real
-  Telegram message sent by a time-driven Apps Script trigger, so it still
-  fires even if nobody has the site open
+- **Print / Save-as-PDF immediately after submitting** — the success dialog
+  shown right after you submit a report has a "Print / Save as PDF" button,
+  plus the same option is available anytime from Report History
+- **12-hour open-case email escalation** — any Initial report still not
+  marked Resolved 12 hours after filing triggers one email to
+  `megar.global@megaworldcorp.com`, and is flagged with an "⚠ 12h+" badge
+  in the dashboard/history for as long as it stays open
+- 6:00 PM open-case reminder — an in-app banner **and** a Telegram message
+  sent by a time-driven Apps Script trigger, so it fires even if nobody has
+  the site open
 - Dark / light mode toggle (persisted per browser)
 - Township "swipe" carousel with a logo badge per township
-- Alert Level / Weather as icon-choice boxes
+- Alert Level / Weather as icon-choice boxes — resilient to a Config sheet
+  category being temporarily empty (falls back to the built-in defaults
+  instead of rendering an empty, unclickable group)
 - Super Admin: manage OPCEN accounts per township, and edit the dropdown
   content (Type of Incident, Classification, Weather) live, no code changes
+- Blue-accented visual theme throughout, matching an operations-console look
 
 ## 1. Set up the Google Sheet + backend
 1. Create a new Google Sheet (this will be your database).
@@ -60,7 +72,16 @@ Browser (GitHub Pages) --fetch()--> Apps Script Web App --> Google Sheet
    via the Super Admin page after your first login.
 5. Select `createDailyReminderTrigger` and click **Run** once — this installs
    the 6:00 PM daily Telegram reminder.
-6. **Deploy > New deployment > Web app**
+6. Select `createOverdueEmailTrigger` and click **Run** once — this installs
+   the hourly check that emails **megar.global@megaworldcorp.com** the first
+   time any Initial report has been open 12+ hours without being resolved.
+   To send to a different address instead, either edit `DEFAULT_ADMIN_EMAIL`
+   at the top of `Code.gs`, or add an `ADMIN_EMAIL` script property (Step 3)
+   — the property takes priority if both are set.
+   > Note: `MailApp.sendEmail` uses your own Google account's daily email
+   > quota (100/day on a personal Gmail account, much higher on Workspace).
+   > That's normally more than enough for incident escalation emails.
+7. **Deploy > New deployment > Web app**
    - Execute as: **Me**
    - Who has access: **Anyone with the link**
    - Click Deploy, copy the `/exec` URL.

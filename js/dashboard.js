@@ -31,13 +31,13 @@ const Dashboard = {
   renderOverview() {
     const total = this.reports.length;
     const open = this.reports.filter(r => r.resolved !== "Yes").length;
-    const red = this.reports.filter(r => r.alertLevel === "Red" && r.resolved !== "Yes").length;
+    const overdue = this.reports.filter(r => r.type === "initial" && r.resolved !== "Yes" && this.isOverdue(r)).length;
     const today = new Date().toISOString().slice(0, 10);
     const filedToday = this.reports.filter(r => r.date === today).length;
 
     document.getElementById("statTotal").textContent = total;
     document.getElementById("statOpen").textContent = open;
-    document.getElementById("statRed").textContent = red;
+    document.getElementById("statOverdue").textContent = overdue;
     document.getElementById("statToday").textContent = filedToday;
 
     // per-township breakdown (super admin sees all townships)
@@ -52,12 +52,23 @@ const Dashboard = {
       list.innerHTML = Object.entries(byTownship)
         .sort((a, b) => b[1].open - a[1].open)
         .map(([name, v]) => `
-          <div class="card" style="display:flex;justify-content:space-between;align-items:center;">
-            <div><div style="font-weight:600;font-size:13.5px;">${name}</div>
-            <div class="text-faint" style="font-size:11.5px;">${v.total} total reports</div></div>
-            <div class="pill ${v.open > 0 ? "pill-red" : "pill-blue"}">${v.open} open</div>
+          <div class="col-12 col-md-6">
+            <div class="card d-flex flex-row justify-content-between align-items-center">
+              <div><div style="font-weight:600;font-size:13.5px;">${name}</div>
+              <div class="text-faint" style="font-size:11.5px;">${v.total} total reports</div></div>
+              <div class="pill ${v.open > 0 ? "pill-red" : "pill-blue"}">${v.open} open</div>
+            </div>
           </div>`).join("") || `<p class="text-muted">No reports yet.</p>`;
     }
+  },
+
+  // An Initial report counts as "overdue" once it has been open 12+ hours
+  // without being marked resolved — this mirrors the 12-hour email alert
+  // the backend sends to megar.global@megaworldcorp.com.
+  isOverdue(r) {
+    if (!r.createdAt) return false;
+    const ageMs = Date.now() - new Date(r.createdAt).getTime();
+    return ageMs >= 12 * 60 * 60 * 1000;
   },
 
   renderHistory() {
@@ -85,6 +96,8 @@ const Dashboard = {
       : `<span class="status ongoing"><span class="dot"></span>Ongoing</span>`;
     const alertPill = { Red: "pill-red", Yellow: "pill-yellow", Blue: "pill-blue" }[r.alertLevel] || "pill-blue";
     const canEdit = r.resolved !== "Yes" && (this.session.role === "admin" || r.township === this.session.township);
+    const overdueBadge = (r.type === "initial" && r.resolved !== "Yes" && this.isOverdue(r))
+      ? ` <span class="pill pill-orange" title="Open 12+ hours">⚠ 12h+</span>` : "";
 
     let actions = `<button title="Preview / Print" onclick='Dashboard.preview(${JSON.stringify(r)})'>🖨️</button>`;
     if (canEdit) {
@@ -98,7 +111,7 @@ const Dashboard = {
     }
 
     return `<tr>
-      <td><span class="code-chip">${r.id}</span></td>
+      <td><span class="code-chip">${r.id}</span>${overdueBadge}</td>
       <td>${r.typeOfIncident || "—"}</td>
       <td><span class="pill ${alertPill}">${r.alertLevel || "—"}</span></td>
       <td>${r.township || "—"}</td>

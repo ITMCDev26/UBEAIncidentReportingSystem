@@ -16,21 +16,23 @@ const Toast = {
 };
 
 const Modal = {
-  open(innerHTML) {
+  open(innerHTML, opts) {
     this.close();
-    const backdrop = document.createElement("div");
-    backdrop.className = "modal-backdrop";
-    backdrop.id = "activeModal";
-    backdrop.addEventListener("click", (e) => { if (e.target === backdrop) this.close(); });
-    const modal = document.createElement("div");
-    modal.className = "modal";
-    modal.innerHTML = innerHTML;
-    backdrop.appendChild(modal);
-    document.body.appendChild(backdrop);
+    const el = document.createElement("div");
+    el.className = "modal fade";
+    el.id = "activeModal";
+    el.tabIndex = -1;
+    el.innerHTML = `<div class="modal-dialog modal-dialog-centered modal-dialog-scrollable">
+      <div class="modal-content">${innerHTML}</div></div>`;
+    document.body.appendChild(el);
+    this._instance = new bootstrap.Modal(el, { backdrop: (opts && opts.staticBackdrop) ? "static" : true });
+    el.addEventListener("hidden.bs.modal", () => el.remove());
+    this._instance.show();
   },
   close() {
     const el = document.getElementById("activeModal");
-    if (el) el.remove();
+    if (el && this._instance) { this._instance.hide(); }
+    else if (el) el.remove();
   }
 };
 

@@ -18,17 +18,19 @@ const ReportPrint = {
   preview(report, type) {
     const title = { initial: "Initial Report", progress: "Progress Report", information: "Information Report" }[type];
     const html = `
-      <div class="modal-head">
-        <h3 style="margin:0;">Report Preview</h3>
-        <button class="icon-btn" onclick="Modal.close()">✕</button>
+      <div class="modal-header">
+        <h5 class="modal-title">Report Preview</h5>
+        <button type="button" class="btn-close" onclick="Modal.close()"></button>
       </div>
-      <div id="printArea" class="print-sheet">
-        <h2>${title} — <span class="mono">${report.id}</span></h2>
-        <div style="color:#666;margin-bottom:12px;">${APP_CONFIG.orgName}</div>
-        ${this.buildRows(report, type)}
+      <div class="modal-body">
+        <div id="printArea" class="print-sheet">
+          <h2>${title} — <span class="mono">${report.id}</span></h2>
+          <div style="color:#666;margin-bottom:12px;">${APP_CONFIG.orgName}</div>
+          ${this.buildRows(report, type)}
+        </div>
       </div>
-      <div class="form-footer" style="border:none;">
-        <button class="btn btn-ghost" onclick="Modal.close()">Close</button>
+      <div class="modal-footer">
+        <button class="btn btn-outline-secondary" onclick="Modal.close()">Close</button>
         <button class="btn btn-primary" onclick="window.print()">🖨️ Print / Save as PDF</button>
       </div>`;
     Modal.open(html);
