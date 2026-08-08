@@ -224,13 +224,20 @@ const FormPage = {
         const cls = opt.className || "";
         const btn = document.createElement("button");
         btn.type = "button";
-        btn.className = "icon-choice" + (value === val ? " selected " + cls : "");
+        btn.className = "icon-choice" + (value === val ? (" selected" + (cls ? " " + cls : "")) : "");
         btn.dataset.value = value; btn.dataset.cls = cls;
         btn.innerHTML = `<span class="ic">${icon}</span> ${opt.label || value}`;
         if (!this.locked) {
           btn.addEventListener("click", () => {
-            [...group.children].forEach(c => { c.classList.remove("selected"); c.classList.remove(c.dataset.cls); });
-            btn.classList.add("selected", cls);
+            // classList.add()/remove() throw if given an empty string, and
+            // weather options have no className (cls === "") — guard every
+            // call so a click always registers instead of silently failing.
+            [...group.children].forEach(c => {
+              c.classList.remove("selected");
+              if (c.dataset.cls) c.classList.remove(c.dataset.cls);
+            });
+            btn.classList.add("selected");
+            if (cls) btn.classList.add(cls);
             group.dataset.value = value;
           });
         } else btn.disabled = true;
