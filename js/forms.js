@@ -141,7 +141,15 @@ const FormPage = {
     fieldKeys.forEach(key => {
       const field = FIELD_LIBRARY[key];
       if (!field) return;
-      root.appendChild(this.renderField(field));
+      // A problem rendering ONE field (bad config data, etc.) must never
+      // stop the rest of the form — or worse, stop the Submit button from
+      // ever getting wired up, which looks exactly like "nothing happens."
+      try {
+        root.appendChild(this.renderField(field));
+      } catch (err) {
+        console.error("Failed to render field " + key + ":", err);
+        Toast.show(`Couldn't load the "${field.label}" field — try refreshing.`, true);
+      }
     });
 
     document.getElementById("submitBtn").disabled = this.locked;
@@ -326,6 +334,9 @@ const FormPage = {
   },
 
   validate(data) {
+    // clear any previous invalid highlighting
+    document.querySelectorAll(".is-invalid-field").forEach(el => el.classList.remove("is-invalid-field"));
+
     for (const key of FORM_SCHEMAS[this.type]) {
       const field = FIELD_LIBRARY[key];
       if (field.showIf) {
@@ -333,11 +344,38 @@ const FormPage = {
         if (parentVal !== field.showIf.equals) continue;
       }
       if (field.required && !data[key]) {
+        const col = document.querySelector(`[data-key="${key}"]`);
+        if (col) {
+          col.classList.add("is-invalid-field");
+          col.scrollIntoView({ behavior: "smooth", block: "center" });
+        }
         Toast.show(`"${field.label}" is required.`, true);
         return false;
       }
     }
     return true;
+  },
+
+  // Blank out every field so the operator sees a clean form and can start
+  // a fresh report immediately, or simply see that the submit went through.
+  resetForm() {
+    FORM_SCHEMAS[this.type].forEach(key => {
+      const field = FIELD_LIBRARY[key];
+      const el = document.getElementById("f_" + key);
+      if (!el) return;
+      if (field.type === "select") { el.value = ""; }
+      else if (field.type === "text" || field.type === "textarea") { el.value = ""; }
+      else if (field.type === "date") { el.value = new Date().toISOString().slice(0, 10); }
+      else if (field.type === "time") { el.value = ""; }
+      else if (["icon-choice", "yesno", "township-carousel"].includes(field.type)) {
+        el.dataset.value = "";
+        [...el.children].forEach(c => {
+          c.classList.remove("selected");
+          if (c.dataset && c.dataset.cls) c.classList.remove(c.dataset.cls);
+        });
+      }
+    });
+    this.wireConditionals();
   },
 
   async submit() {
@@ -363,15 +401,19 @@ const FormPage = {
       // The backend returns the full saved record (not just an id) so we
       // can offer an immediate print / save-as-PDF right after submitting.
       const fullReport = (result && result.id && result.type) ? result : { ...data, id: result.id, type: this.type };
+
+      if (this.mode !== "edit") this.resetForm(); // fresh form for the next report
+      btn.textContent = "Submit Report";
+      btn.disabled = false;
       this.showSuccess(fullReport, verb);
     } catch (e) {
-      Toast.show(e.message || "Submission failed", true);
+      Toast.show(e.message || "Submission failed — the report was NOT saved.", true);
       btn.disabled = false; btn.textContent = "Submit Report";
     }
   },
 
   showSuccess(report, verb) {
-    Toast.show(`Report ${verb}: ${report.id}`);
+    Toast.show(`Report ${verb}: ${report.id} — saved to Sheets & Telegram.`);
     const html = `
       <div class="modal-header">
         <h5 class="modal-title">✅ Report ${verb}</h5>
@@ -380,13 +422,33 @@ const FormPage = {
       <div class="modal-body text-center py-4">
         <div class="mb-2 text-muted">Reference code</div>
         <div class="code-chip" style="font-size:16px;padding:8px 16px;">${report.id}</div>
-        <p class="text-muted mt-3 mb-0">Your report has been saved to the Sheet and posted to the Telegram group.</p>
+        <p class="text-muted mt-3 mb-0">Saved to the Sheet and posted to Telegram. It's already in Report History.</p>
+        <p class="text-faint mt-2 mb-0" id="autoRedirectNote" style="font-size:12px;">Returning to Report History in <span id="autoRedirectSecs">6</span>s…</p>
       </div>
       <div class="modal-footer">
-        <button class="btn btn-outline-secondary" onclick="Modal.close(); window.location.href='dashboard.html#history';">Go to History</button>
-        <button class="btn btn-primary" onclick="ReportPrint.preview(${JSON.stringify(report).replace(/'/g, "&#39;")}, '${report.type}')">🖨️ Print / Save as PDF</button>
+        <button class="btn btn-outline-secondary" onclick="FormPage.cancelAutoRedirect(); Modal.close(); window.location.href='dashboard.html#history';">Go to History Now</button>
+        <button class="btn btn-primary" onclick="FormPage.cancelAutoRedirect(); ReportPrint.preview(${JSON.stringify(report).replace(/'/g, "&#39;")}, '${report.type}')">🖨️ Print / Save as PDF</button>
       </div>`;
     Modal.open(html, { staticBackdrop: true });
+
+    // Auto-return to History after a few seconds so a filed report is
+    // never left "hanging" on screen — cancelled if the operator clicks
+    // Print (they're clearly still working with this report) or navigates
+    // away manually first.
+    let secs = 6;
+    this._redirectTimer = setInterval(() => {
+      secs -= 1;
+      const el = document.getElementById("autoRedirectSecs");
+      if (el) el.textContent = secs;
+      if (secs <= 0) {
+        this.cancelAutoRedirect();
+        window.location.href = "dashboard.html#history";
+      }
+    }, 1000);
+  },
+
+  cancelAutoRedirect() {
+    if (this._redirectTimer) { clearInterval(this._redirectTimer); this._redirectTimer = null; }
   }
 };
 

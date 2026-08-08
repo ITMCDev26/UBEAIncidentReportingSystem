@@ -288,6 +288,13 @@ table.report-table{width:100%;border-collapse:collapse;font-size:13.5px;}
 }
 .form-section-title:first-child{margin-top:0;}
 .required-mark{color:var(--red);}
+.is-invalid-field{animation:invalidPulse .5s ease;}
+.is-invalid-field .form-control,.is-invalid-field .form-select,
+.is-invalid-field .icon-choice-group,.is-invalid-field .township-carousel{
+  border-radius:var(--radius-sm);box-shadow:0 0 0 3px color-mix(in srgb, var(--red) 25%, transparent);
+}
+.is-invalid-field .icon-choice-group,.is-invalid-field .township-carousel{border:1.5px solid var(--red);padding:6px;}
+@keyframes invalidPulse{0%,100%{transform:translateX(0);}25%{transform:translateX(-4px);}75%{transform:translateX(4px);}}
 
 /* icon-choice (alert level / weather) */
 .icon-choice-group{display:flex;flex-wrap:wrap;gap:8px;}

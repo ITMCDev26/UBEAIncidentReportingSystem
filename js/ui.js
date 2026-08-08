@@ -1,4 +1,17 @@
-/* ui.js — toast notifications + simple modal helper, shared across pages */
+/* ui.js — toast notifications + Bootstrap modal helper, shared across pages */
+
+// Global safety net: if ANY uncaught error happens anywhere in the app
+// (a bad field render, a failed fetch, a typo), surface it as a toast
+// instead of leaving the person staring at a button that "does nothing."
+window.addEventListener("error", (e) => {
+  console.error("Uncaught error:", e.error || e.message);
+  if (typeof Toast !== "undefined") Toast.show("Something went wrong: " + (e.message || "unknown error"), true);
+});
+window.addEventListener("unhandledrejection", (e) => {
+  console.error("Unhandled promise rejection:", e.reason);
+  if (typeof Toast !== "undefined") Toast.show("Something went wrong: " + (e.reason && e.reason.message ? e.reason.message : e.reason), true);
+});
+
 const Toast = {
   show(msg, isError) {
     let wrap = document.querySelector(".toast-wrap");
