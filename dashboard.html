@@ -16,13 +16,11 @@
         <h1>Command Center Dashboard</h1>
         <div class="topbar-right">
           <button class="icon-btn" data-shell="theme-btn" id="themeToggle">☀️</button>
-          <a class="btn btn-primary d-none d-sm-inline-flex" href="new-report.html?type=initial&mode=new" style="padding:9px 16px;">+ New Initial Report</a>
         </div>
       </div>
 
       <div class="page">
         <div class="banner hidden" id="openCaseBanner"></div>
-        <a class="btn btn-primary w-100 d-sm-none mb-3" href="new-report.html?type=initial&mode=new">+ New Initial Report</a>
 
         <section id="overviewPage">
           <div class="row g-3 mb-4">
@@ -50,7 +48,7 @@
             </select>
             <input type="text" id="filterSearch" class="form-control" style="max-width:220px;" placeholder="Search code, incident, reporter…" oninput="Dashboard.renderHistory()" />
             <div class="spacer"></div>
-            <a class="btn btn-ghost" href="new-report.html?type=information&mode=new">+ Information Report</a>
+            <button class="btn btn-ghost" onclick="Dashboard.refresh(true)">🔄 Refresh</button>
           </div>
           <div class="card" style="padding:0;overflow:hidden;">
             <div class="table-responsive">

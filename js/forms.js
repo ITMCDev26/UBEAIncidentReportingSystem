@@ -31,11 +31,47 @@ const FormPage = {
 
   async init() {
     Auth.requireLogin();
-    this.type = this.qs.get("type") || "initial";
+    this.type = this.qs.get("type") || "";
     this.mode = this.qs.get("mode") || "new";
     this.refId = this.qs.get("ref");
 
-    this.renderTypeTabs();
+    // Landing on New Report with no type chosen yet (the normal case when
+    // clicking "New Report" in the nav) shows the two big choice buttons.
+    // Everything else (a type already in the URL, edits, follow-ups,
+    // Progress reports launched from an Initial record) goes straight to
+    // the form — the chooser is only ever the very first click.
+    if (!this.type) {
+      this.showChooser();
+      return;
+    }
+    document.getElementById("reportChooser").classList.add("hidden");
+    document.getElementById("formCardWrap").classList.remove("hidden");
+    await this.loadForm();
+  },
+
+  showChooser() {
+    document.getElementById("formTitle").textContent = "New Report";
+    document.getElementById("reportChooser").classList.remove("hidden");
+    document.getElementById("formCardWrap").classList.add("hidden");
+    document.querySelectorAll("#reportChooser [data-choose-type]").forEach(card => {
+      const choose = () => {
+        const type = card.dataset.chooseType;
+        history.replaceState(null, "", `new-report.html?type=${type}&mode=new`);
+        this.type = type; this.mode = "new";
+        document.getElementById("reportChooser").classList.add("hidden");
+        const wrap = document.getElementById("formCardWrap");
+        wrap.classList.remove("hidden");
+        wrap.classList.add("flash-in");
+        this.loadForm();
+      };
+      card.addEventListener("click", choose);
+      card.addEventListener("keydown", (e) => {
+        if (e.key === "Enter" || e.key === " ") { e.preventDefault(); choose(); }
+      });
+    });
+  },
+
+  async loadForm() {
     document.getElementById("formTitle").textContent = this.titleFor(this.type, this.mode);
 
     try {
@@ -75,23 +111,6 @@ const FormPage = {
     if (mode === "edit") return "Edit " + names[type];
     if (mode === "followup") return "New Update — " + names[type];
     return "New " + names[type];
-  },
-
-  // Renders the Initial / Information tab switcher on the New Report page.
-  // Only shown for brand-new reports — Progress reports are always reached
-  // via "Start Progress Report" on an Initial record, never picked directly.
-  renderTypeTabs() {
-    const el = document.getElementById("reportTypeTabs");
-    if (!el) return;
-    if (this.mode !== "new" || this.type === "progress") { el.classList.add("hidden"); return; }
-    el.classList.remove("hidden");
-    const tabs = [
-      { type: "initial", label: "🆕 Initial Report" },
-      { type: "information", label: "ℹ️ Information Report" }
-    ];
-    el.innerHTML = tabs.map(t =>
-      `<a class="report-type-tab ${t.type === this.type ? "active" : ""}" href="new-report.html?type=${t.type}&mode=new">${t.label}</a>`
-    ).join("");
   },
 
   // Combines the local fallback config with whatever the backend returned,
@@ -416,7 +435,7 @@ const FormPage = {
     Toast.show(`Report ${verb}: ${report.id} — saved to Sheets & Telegram.`);
     const html = `
       <div class="modal-header">
-        <h5 class="modal-title">✅ Report ${verb}</h5>
+        <h5 class="modal-title"><span class="celebrate-emoji">🎉</span> Report ${verb}!</h5>
         <button type="button" class="btn-close" onclick="Modal.close()"></button>
       </div>
       <div class="modal-body text-center py-4">

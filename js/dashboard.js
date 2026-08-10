@@ -9,12 +9,16 @@ const Dashboard = {
     AppShell.mount(location.hash === "#overview" || !location.hash ? "overview" : "history");
     this.route();
     window.addEventListener("hashchange", () => this.route());
+    await this.refresh(false);
+  },
 
+  async refresh(announce) {
     try {
       this.reports = await API.listReports({}) || [];
+      if (announce) Toast.show(`Refreshed — ${this.reports.length} report(s) loaded.`);
     } catch (e) {
       Toast.show("Could not load reports: " + e.message, true);
-      this.reports = [];
+      this.reports = this.reports || [];
     }
     this.renderOverview();
     this.renderHistory();

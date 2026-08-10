@@ -25,13 +25,35 @@
           🔒 This incident is marked <b>Resolved</b>. Records are locked and can no longer be edited.
         </div>
 
-        <div class="report-type-tabs hidden" id="reportTypeTabs"></div>
+        <div id="reportChooser" class="hidden">
+          <p class="text-muted mb-4" style="font-size:15px;">What would you like to file?</p>
+          <div class="row g-3">
+            <div class="col-12 col-md-6">
+              <div class="chooser-card chooser-blue" data-choose-type="initial" tabindex="0">
+                <div class="chooser-icon">🆕</div>
+                <div class="chooser-title">Initial Report</div>
+                <div class="chooser-sub">Something just happened in your township — start the record here.</div>
+                <div class="chooser-cta">Start Report →</div>
+              </div>
+            </div>
+            <div class="col-12 col-md-6">
+              <div class="chooser-card chooser-orange" data-choose-type="information" tabindex="0">
+                <div class="chooser-icon">ℹ️</div>
+                <div class="chooser-title">Information Report</div>
+                <div class="chooser-sub">An incident outside your township that you're supporting or tracking.</div>
+                <div class="chooser-cta">Start Report →</div>
+              </div>
+            </div>
+          </div>
+        </div>
 
-        <div class="card form-card">
-          <div id="formRoot" class="row g-3"></div>
-          <div class="form-footer">
-            <a class="btn btn-ghost" href="dashboard.html#history">Cancel</a>
-            <button class="btn btn-primary" id="submitBtn">Submit Report</button>
+        <div id="formCardWrap" class="hidden">
+          <div class="card form-card">
+            <div id="formRoot" class="row g-3"></div>
+            <div class="form-footer">
+              <a class="btn btn-ghost" href="dashboard.html#history">Cancel</a>
+              <button class="btn btn-primary" id="submitBtn">Submit Report</button>
+            </div>
           </div>
         </div>
       </div>
