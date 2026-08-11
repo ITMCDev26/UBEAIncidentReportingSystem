@@ -15,22 +15,22 @@ const APP_CONFIG = {
   orgName: "Unified Command Center",
 
   townships: [
-    { code: "ARCV", name: "Arcovia City Estate Association, Inc." },
-    { code: "BNCE", name: "Boracay New Coast Estate Association" },
-    { code: "CAPT", name: "Capital Town Association, Inc." },
-    { code: "CTLK", name: "Citylink Coach Services, Inc." },
+    { code: "ACEA", name: "Arcovia City Estate Association, Inc." },
+    { code: "BNFI", name: "Boracay New Coast Estate Association" },
+    { code: "CTAI", name: "Capital Town Association, Inc." },
+    { code: "CITYLINK", name: "Citylink Coach Services, Inc." },
     { code: "DPDA", name: "Davao Park District Association, Inc." },
-    { code: "IBPA", name: "Iloilo Business Park Estate Association" },
+    { code: "IBPEA", name: "Iloilo Business Park Estate Association" },
     { code: "MGEA", name: "Maple Grove Estate Association" },
-    { code: "MTCE", name: "Mckinley Town Center Estate Association" },
-    { code: "MKWE", name: "Mckinley West Estate Association" },
-    { code: "NPCE", name: "Newport City Estate Association" },
-    { code: "NHGE", name: "Northill Gateway Estate Association" },
-    { code: "SWCE", name: "Southwoods City Estate Association" },
-    { code: "MCTN", name: "The Mactan Newtown Estate Association" },
-    { code: "UPEA", name: "The Upper East Estate Association" },
+    { code: "MTCEA", name: "Mckinley Town Center Estate Association" },
+    { code: "MWEA", name: "Mckinley West Estate Association" },
+    { code: "NCEA", name: "Newport City Estate Association" },
+    { code: "NGEA", name: "Northill Gateway Estate Association" },
+    { code: "SCEA", name: "Southwoods City Estate Association" },
+    { code: "TMNEA", name: "The Mactan Newtown Estate Association" },
+    { code: "TUEEA", name: "The Upper East Estate Association" },
     { code: "UBEA", name: "Uptown Bonifacio Estate Association" },
-    { code: "WSCE", name: "Westside City Estate Association" }
+    { code: "WEAI", name: "Westside City Estate Association" }
   ],
 
   incidentTypes: [
