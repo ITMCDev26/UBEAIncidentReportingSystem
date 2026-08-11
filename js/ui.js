@@ -12,6 +12,15 @@ window.addEventListener("unhandledrejection", (e) => {
   if (typeof Toast !== "undefined") Toast.show("Something went wrong: " + (e.reason && e.reason.message ? e.reason.message : e.reason), true);
 });
 
+// Free text (narratives, people's names, admin-configured dropdown
+// options) can contain characters like & < > " ' — escape before dropping
+// it into innerHTML anywhere, so it never breaks the surrounding markup.
+function escapeHtml(v) {
+  return String(v == null ? "" : v)
+    .replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;").replace(/'/g, "&#39;");
+}
+
 const Toast = {
   show(msg, isError) {
     let wrap = document.querySelector(".toast-wrap");

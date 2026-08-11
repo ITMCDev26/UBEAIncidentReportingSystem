@@ -17,16 +17,22 @@ const Admin = {
     const tbody = document.getElementById("usersBody");
     tbody.innerHTML = this.users.map(u => `
       <tr>
-        <td>${u.username}</td>
-        <td>${u.fullName || ""}</td>
-        <td>${u.township}</td>
-        <td><span class="pill ${u.role === "admin" ? "pill-red" : "pill-blue"}">${u.role}</span></td>
-        <td><button class="btn btn-ghost" style="padding:6px 10px;" onclick='Admin.editUser(${JSON.stringify(u)})'>Edit</button></td>
+        <td>${escapeHtml(u.username)}</td>
+        <td>${escapeHtml(u.fullName) || ""}</td>
+        <td>${escapeHtml(u.township)}</td>
+        <td><span class="pill ${u.role === "admin" ? "pill-red" : "pill-blue"}">${escapeHtml(u.role)}</span></td>
+        <td><button class="btn btn-ghost" style="padding:6px 10px;" onclick="Admin.editUserByUsername('${String(u.username).replace(/'/g, "\\'")}')">Edit</button></td>
       </tr>`).join("") || `<tr><td colspan="5" class="text-muted">No accounts yet.</td></tr>`;
 
     const twSelect = document.getElementById("u_township");
     twSelect.innerHTML = '<option value="ALL">ALL (Admin)</option>' +
-      APP_CONFIG.townships.map(t => `<option value="${t.name}">${t.name}</option>`).join("");
+      APP_CONFIG.townships.map(t => `<option value="${t.name}">${escapeHtml(t.name)}</option>`).join("");
+  },
+
+  editUserByUsername(username) {
+    const u = this.users.find(x => String(x.username) === String(username));
+    if (!u) { Toast.show("Could not find that account — try refreshing.", true); return; }
+    this.editUser(u);
   },
 
   editUser(u) {

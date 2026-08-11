@@ -58,7 +58,7 @@ const Dashboard = {
         .map(([name, v]) => `
           <div class="col-12 col-md-6">
             <div class="card d-flex flex-row justify-content-between align-items-center">
-              <div><div style="font-weight:600;font-size:13.5px;">${name}</div>
+              <div><div style="font-weight:600;font-size:13.5px;">${escapeHtml(name)}</div>
               <div class="text-faint" style="font-size:11.5px;">${v.total} total reports</div></div>
               <div class="pill ${v.open > 0 ? "pill-red" : "pill-blue"}">${v.open} open</div>
             </div>
@@ -103,7 +103,7 @@ const Dashboard = {
     const overdueBadge = (r.type === "initial" && r.resolved !== "Yes" && this.isOverdue(r))
       ? ` <span class="pill pill-orange" title="Open 12+ hours">⚠ 12h+</span>` : "";
 
-    let actions = `<button title="Preview / Print" onclick='Dashboard.preview(${JSON.stringify(r)})'>🖨️</button>`;
+    let actions = `<button title="Preview / Print" onclick="Dashboard.previewById('${r.type}','${String(r.id).replace(/'/g, "\\'")}')">🖨️</button>`;
     if (canEdit) {
       actions += `<button title="Edit" onclick="location.href='new-report.html?type=${r.type}&mode=edit&ref=${encodeURIComponent(r.id)}'">✏️</button>`;
     }
@@ -120,11 +120,11 @@ const Dashboard = {
     // no further Progress/Information updates can be generated from it.
 
     return `<tr>
-      <td><span class="code-chip">${r.id}</span>${overdueBadge}</td>
-      <td>${r.typeOfIncident || "—"}</td>
-      <td><span class="pill ${alertPill}">${r.alertLevel || "—"}</span></td>
-      <td>${r.township || "—"}</td>
-      <td>${r.date || "—"}</td>
+      <td><span class="code-chip">${escapeHtml(r.id)}</span>${overdueBadge}</td>
+      <td>${escapeHtml(r.typeOfIncident) || "—"}</td>
+      <td><span class="pill ${alertPill}">${escapeHtml(r.alertLevel) || "—"}</span></td>
+      <td>${escapeHtml(r.township) || "—"}</td>
+      <td>${escapeHtml(r.date) || "—"}</td>
       <td>${statusHTML}</td>
       <td><div class="row-actions">${actions}</div></td>
     </tr>`;
@@ -132,6 +132,12 @@ const Dashboard = {
 
   preview(report) {
     ReportPrint.preview(report, report.type);
+  },
+
+  previewById(type, id) {
+    const r = this.reports.find(x => x.type === type && String(x.id) === String(id));
+    if (!r) { Toast.show("Could not find that report — try refreshing.", true); return; }
+    this.preview(r);
   },
 
   checkOpenCaseReminder() {
