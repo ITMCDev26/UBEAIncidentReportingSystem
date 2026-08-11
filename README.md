@@ -112,6 +112,22 @@ Township | Role`.
 
 That's it — no server, no hosting cost, no separate database to maintain.
 
+## Troubleshooting the Sheets / Telegram connection
+If reports are saving but Telegram isn't posting, or the Dashboard/History
+doesn't seem to match the Sheet:
+1. **Redeploy after any Code.gs change.** Editing the script in the Apps
+   Script editor does NOT update your live `/exec` URL — you must go
+   **Deploy > Manage deployments > (pencil icon) > New version > Deploy**
+   every time, or your site keeps hitting the old code.
+2. Run **`checkConnections`** from the function dropdown, then **View >
+   Logs**. It checks your Spreadsheet ID, Telegram token/chat ID, and
+   installed triggers in one pass and tells you exactly which one is
+   missing or failing, instead of failing silently.
+3. If only Telegram is suspect, run **`testTelegram`** the same way.
+4. Common Telegram gotcha: the bot must actually be a **member of the
+   group/channel** for `TELEGRAM_CHAT_ID`, and for a channel the id is
+   usually negative (e.g. `-1001234567890`).
+
 ## Notes / things to customize
 - **Township logos**: currently rendered as a colored badge with the
   township's 2-letter code. Drop real logo images into `assets/` and swap

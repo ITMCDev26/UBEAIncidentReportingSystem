@@ -98,7 +98,11 @@ const FormPage = {
     }
 
     const session = Auth.getSession();
-    if (!this.values.reportedBy) this.values.reportedBy = session.fullName || session.username;
+    // Always the current operator, in every mode (new, follow-up, or
+    // edit) — the backend re-applies this on save regardless of what's
+    // shown here, so the form should never suggest it's editable or that
+    // it belongs to whoever originally filed the record.
+    this.values.reportedBy = session.fullName || session.username;
     if (!this.values.township && session.township && session.township !== "ALL") {
       this.values.township = session.township;
     }
@@ -215,6 +219,24 @@ const FormPage = {
       inp.className = "form-control";
       inp.type = "text"; inp.id = "f_" + field.key; inp.value = val; inp.disabled = this.locked;
       return this.fieldWrap(field, inp);
+    }
+
+    if (field.type === "readonly") {
+      // Locked, backend-sourced field (e.g. Reported By). Rendered as a
+      // disabled input so it still submits with the form and looks
+      // obviously non-editable, plus a small note explaining why.
+      const inp = document.createElement("input");
+      inp.className = "form-control readonly-field";
+      inp.type = "text"; inp.id = "f_" + field.key; inp.value = val;
+      inp.disabled = true; inp.readOnly = true;
+      const wrap = document.createElement("div");
+      wrap.appendChild(inp);
+      const note = document.createElement("div");
+      note.className = "text-faint";
+      note.style.fontSize = "11px"; note.style.marginTop = "5px";
+      note.textContent = "🔒 Locked to your account on file — cannot be edited.";
+      wrap.appendChild(note);
+      return this.fieldWrap(field, wrap);
     }
 
     if (field.type === "date") {

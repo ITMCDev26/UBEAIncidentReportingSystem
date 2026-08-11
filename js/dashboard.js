@@ -108,11 +108,16 @@ const Dashboard = {
       actions += `<button title="Edit" onclick="location.href='new-report.html?type=${r.type}&mode=edit&ref=${encodeURIComponent(r.id)}'">✏️</button>`;
     }
     if (r.type === "initial" && r.resolved !== "Yes") {
-      actions += `<button title="Start Progress Report" onclick="location.href='new-report.html?type=progress&mode=new&ref=${encodeURIComponent(r.id)}'">➡️</button>`;
+      actions += `<button title="Start Progress Report on this incident" onclick="location.href='new-report.html?type=progress&mode=new&ref=${encodeURIComponent(r.id)}'">➡️</button>`;
     }
-    if ((r.type === "progress" || r.type === "information") && r.resolved !== "Yes") {
-      actions += `<button title="Add Follow-up" onclick="location.href='new-report.html?type=${r.type}&mode=followup&ref=${encodeURIComponent(r.id)}'">➕</button>`;
+    if (r.type === "progress" && r.resolved !== "Yes") {
+      actions += `<button title="Add another Progress Update to this incident" onclick="location.href='new-report.html?type=progress&mode=followup&ref=${encodeURIComponent(r.id)}'">🔄</button>`;
     }
+    if (r.type === "information" && r.resolved !== "Yes") {
+      actions += `<button title="Send another Information Report on this thread" onclick="location.href='new-report.html?type=information&mode=followup&ref=${encodeURIComponent(r.id)}'">📨</button>`;
+    }
+    // Once resolved, none of the above render — the thread is closed and
+    // no further Progress/Information updates can be generated from it.
 
     return `<tr>
       <td><span class="code-chip">${r.id}</span>${overdueBadge}</td>

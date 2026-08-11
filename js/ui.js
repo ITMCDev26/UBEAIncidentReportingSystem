@@ -82,6 +82,7 @@ const AppShell = {
             <div class="user-role">${isAdmin ? "Super Admin" : session.township}</div></div>
           </div>
           <button class="btn btn-ghost" style="width:100%;margin-top:10px;" onclick="Auth.logout()">Log Out</button>
+          <div class="sidebar-status"><span class="status-dot"></span>SYSTEM ONLINE</div>
         </div>`;
     });
 

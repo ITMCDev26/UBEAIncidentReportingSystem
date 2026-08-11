@@ -44,7 +44,11 @@ const FIELD_LIBRARY = {
     key: "resolved", label: "Is the Incident Already Resolved?", type: "yesno", required: true
   },
   respondingPersonnel: { key: "respondingPersonnel", label: "Responding Personnel", type: "textarea", required: true },
-  reportedBy: { key: "reportedBy", label: "Reported By", type: "text", required: true }
+  // Locked to the logged-in operator's own name on file — never a free
+  // text field. The backend enforces this too (it overwrites reportedBy
+  // with the session's name on every save), so this is not just a UI
+  // nicety, it can't be spoofed by editing the form.
+  reportedBy: { key: "reportedBy", label: "Reported By", type: "readonly", required: true }
 };
 
 const FORM_SCHEMAS = {
@@ -75,12 +79,15 @@ const FORM_SCHEMAS = {
 const CARRY_FROM_INITIAL_TO_PROGRESS = [
   "typeOfIncident", "incidentClassification", "alertLevel", "township",
   "location", "landmark", "weather", "date", "timeOfIncident",
-  "casualties", "narrative", "actionTaken", "respondingPersonnel", "reportedBy"
+  "casualties", "narrative", "actionTaken", "respondingPersonnel"
 ];
 
 // Fields copied over when a follow-up series (-2, -3 ...) is started on an
 // existing Progress or Information report.
+// Note: reportedBy is intentionally NOT carried forward — it's always the
+// operator who is filing THIS particular follow-up/progress entry, not
+// whoever filed the original record.
 const CARRY_FROM_PREVIOUS_SERIES = [
   "typeOfIncident", "incidentClassification", "alertLevel", "township",
-  "location", "landmark", "incidentCategory", "reportedBy"
+  "location", "landmark", "incidentCategory"
 ];
