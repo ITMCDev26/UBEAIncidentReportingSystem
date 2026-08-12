@@ -10,7 +10,7 @@
 
 const APP_CONFIG = {
   // Set this to your deployed Apps Script Web App URL (ends in /exec)
-  API_URL: "https://script.google.com/macros/s/AKfycbxJ2Au3G55d6OSJdLrjCE73j4mRJyiaYSN0EJrebQC7OFq5JSNsSpAiXuOIltwBviA5ug/exec",
+  API_URL: "https://script.google.com/macros/s/AKfycbwwNUDVa5L9QwMS38yebVGkrxZQEMQaeei7lMKAb3DK38X2t0x_-REFZ2A4UhceP9TvIQ/exec",
 
   orgName: "Unified Command Center",
 
