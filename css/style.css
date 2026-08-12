@@ -498,6 +498,25 @@ table.report-table{width:100%;border-collapse:collapse;font-size:13.5px;}
 .print-sheet .pr-footerrow{display:flex;justify-content:space-between;font-size:9.5px;color:#888;}
 @media print{
   .print-sheet{border-radius:0;}
+  /* Without this, window.print() prints the ENTIRE page behind the modal
+     — sidebar, topbar, bottom tabs, the modal chrome itself — with only
+     the actual report squeezed somewhere inside the modal's own
+     position:fixed + vertically-centered + overflow:auto box, which
+     print doesn't expand to fit. That's exactly the "content floating
+     in the middle of a mostly-blank, clipped page" you'd see without
+     this rule. Two things are needed together: hide everything except
+     #printArea, AND strip the modal's fixed/centered/scrolling behavior
+     back to normal flow so the report starts at the top of the page and
+     can paginate across multiple pages like a normal document. */
+  body *{visibility:hidden;}
+  #printArea, #printArea *{visibility:visible;}
+  .modal,.modal-dialog,.modal-content,.modal-body{
+    position:static !important;display:block !important;height:auto !important;
+    max-height:none !important;overflow:visible !important;transform:none !important;
+    margin:0 !important;padding:0 !important;box-shadow:none !important;border:none !important;
+  }
+  #printArea{position:static;width:100%;margin:0;box-shadow:none;border-radius:0;}
+  .modal-header,.modal-footer,.modal-backdrop,.bottom-tabs,.sidebar,.topbar{display:none !important;}
 }
 
 /* report-type tabs (Initial / Information) on the New Report page */
@@ -583,9 +602,4 @@ table.report-table{width:100%;border-collapse:collapse;font-size:13.5px;}
   .page{padding:16px;}
   .grid-4,.grid-3,.grid-2{grid-template-columns:1fr 1fr;}
   table.report-table{display:block;overflow-x:auto;white-space:nowrap;}
-}
-@media print{
-  body *{visibility:hidden;}
-  #printArea,#printArea *{visibility:visible;}
-  #printArea{position:absolute;top:0;left:0;width:100%;}
 }
