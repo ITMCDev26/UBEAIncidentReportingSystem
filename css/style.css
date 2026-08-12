@@ -481,11 +481,24 @@ table.report-table{width:100%;border-collapse:collapse;font-size:13.5px;}
 }
 
 /* printable report */
-.print-sheet{background:#fff;color:#111;padding:24px;font-family:Arial,sans-serif;font-size:12.5px;border-radius:8px;}
-.print-sheet h2{margin:0 0 2px;font-size:16px;}
-.print-sheet .pr-row{display:flex;border-bottom:1px solid #ddd;padding:6px 0;}
-.print-sheet .pr-label{width:170px;font-weight:700;color:#444;flex:none;}
-.print-sheet .pr-value{flex:1;white-space:pre-wrap;}
+.print-sheet{background:#fff;color:#111;font-family:Arial,sans-serif;font-size:12.5px;border-radius:8px;overflow:hidden;padding:26px 28px 20px;}
+.print-sheet .pr-letterhead{display:flex;justify-content:space-between;align-items:flex-start;padding-bottom:14px;border-bottom:1.5px solid #222;}
+.print-sheet .pr-org{font-size:15px;font-weight:800;letter-spacing:.01em;color:#111;}
+.print-sheet .pr-orgsub{font-size:10.5px;color:#555;margin-top:2px;}
+.print-sheet .pr-lh-right{text-align:right;font-size:10px;color:#666;line-height:1.6;}
+.print-sheet .pr-title{
+  text-align:center;font-size:19px;font-weight:800;letter-spacing:.03em;text-transform:uppercase;
+  color:#111;margin:22px 0 20px;
+}
+.print-sheet .pr-body{padding:0 2px;}
+.print-sheet .pr-row{display:flex;border-bottom:1px solid #eee;padding:7px 0;}
+.print-sheet .pr-label{width:160px;font-weight:700;color:#222;flex:none;}
+.print-sheet .pr-value{flex:1;white-space:pre-wrap;color:#111;}
+.print-sheet .pr-footer{margin-top:24px;border-top:1px dashed #bbb;padding-top:8px;}
+.print-sheet .pr-footerrow{display:flex;justify-content:space-between;font-size:9.5px;color:#888;}
+@media print{
+  .print-sheet{border-radius:0;}
+}
 
 /* report-type tabs (Initial / Information) on the New Report page */
 .report-type-tabs{display:flex;gap:8px;margin-bottom:20px;flex-wrap:wrap;}

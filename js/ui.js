@@ -21,6 +21,14 @@ function escapeHtml(v) {
     .replace(/"/g, "&quot;").replace(/'/g, "&#39;");
 }
 
+// Mirrors the backend's sameTownship_ — a stray leading/trailing space or
+// a casing difference between a report's Township and an operator's own
+// account Township should never cause a mismatch (hiding a report that
+// should be editable, or a false negative in the 6PM open-case check).
+function sameTownship(a, b) {
+  return String(a || "").trim().toLowerCase() === String(b || "").trim().toLowerCase();
+}
+
 const Toast = {
   show(msg, isError) {
     let wrap = document.querySelector(".toast-wrap");
